@@ -125,7 +125,7 @@ class ComparisonResult:
             bbox_to_anchor=(0.5, 0.945),
         )
         figure.suptitle(
-            "Propagation statistics for matched field ensembles", y=0.995, fontsize=13
+            "Propagation statistics for field ensembles", y=0.995, fontsize=13
         )
         figure.tight_layout(rect=(0.0, 0.0, 1.0, 0.89))
         return figure

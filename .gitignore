@@ -6,6 +6,7 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 /logALP demo.ipynb
+/demo_mhd_sightlines.npy
 .ruff_cache/
 .venv/
 build/

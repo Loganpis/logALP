@@ -113,44 +113,35 @@ result.plot_tail_probabilities(threshold=3.0)
 
 These functions are implemented and covered by the package test suite. The proxy they currently call is educational and will be replaced or supplemented by validated scientific backends without changing the basic user workflow.
 
-## Planned: using your own magnetic-field sightlines
+## Using your own magnetic-field sightlines
 
-> The commands in this section specify the intended post-demo interface; they are not implemented in `0.1.0`.
+Version `0.1.0` accepts user fields as two-dimensional NumPy arrays with shape `(n_sightlines, n_z)`. Raw three-dimensional MHD volumes must first be reduced to one-dimensional sightlines containing the selected transverse field component.
 
-Users normally provide one-dimensional field ensembles extracted from their MHD, GRF, cell-based, analytic, or other magnetic-field models. Raw three-dimensional simulation volumes are not required by the core package.
+```python
+import numpy as np
+import logalp
 
-1. Convert each ensemble to the documented HDF5 or NPZ interchange format.
-2. Validate units, grid conventions, path length, metadata, and finite values.
-3. Compare the supplied ensembles directly, or generate matched GRF controls.
-4. Run every ensemble with one frozen propagation configuration.
-5. Inspect the saved matching report before interpreting propagation differences.
+values_a = np.load("model_a_sightlines.npy")
+values_b = np.load("model_b_sightlines.npy")
 
-```bash
-# Validate without performing propagation
-logalp sightlines validate fields/model_a.h5
-logalp sightlines validate fields/model_b.h5
+config = logalp.BenchmarkConfig.baseline(
+    n_sightlines=values_a.shape[0],
+    n_z=values_a.shape[1],
+    length_kpc=400.0,
+)
 
-# Direct comparison of two supplied field ensembles
-logalp compare \
-  --field Model-A=fields/model_a.h5 \
-  --field Model-B=fields/model_b.h5 \
-  --config configs/baseline.yaml \
-  --output results/direct-comparison
+model_a = logalp.FieldEnsemble("Model A", values_a, config.z_kpc)
+model_b = logalp.FieldEnsemble("Model B", values_b, config.z_kpc)
 
-# Controlled comparison: build GRFs matched to Model A, then propagate both
-logalp grf match fields/model_a.h5 \
-  --config configs/baseline.yaml \
-  --seed 240513 \
-  --output fields/model_a_matched_grf.h5
-
-logalp compare \
-  --field Model-A=fields/model_a.h5 \
-  --field Matched-GRF=fields/model_a_matched_grf.h5 \
-  --config configs/baseline.yaml \
-  --output results/controlled-comparison
+result = logalp.compare({"Model A": model_a, "Model B": model_b}, config)
+result.plot_sightlines()
+result.plot_power_spectra()
+result.plot_distributions()
 ```
 
-The direct comparison asks whether the complete supplied models produce different propagation. The controlled comparison asks whether a difference remains after the declared RMS and one-dimensional power-spectrum controls are matched.
+The arrays must be finite, use the same increasing spatial grid, contain at least two sightlines, and match `config.n_z`. The tutorial's section **“10. How to insert your own magnetic field”** creates, saves, reloads, and compares a complete `.npy` example.
+
+This is a direct comparison. Automatic resampling, dedicated HDF5/NPZ adapters, and construction of GRFs matched to an arbitrary user field remain planned. Until matching is implemented, inspect the RMS and power-spectrum diagnostics before attributing differences to higher-order morphology.
 
 ## Scientific scope
 
