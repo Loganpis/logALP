@@ -4,6 +4,8 @@ __pycache__/
 .coverage
 .DS_Store
 .pytest_cache/
+.ipynb_checkpoints/
+/logALP demo.ipynb
 .ruff_cache/
 .venv/
 build/

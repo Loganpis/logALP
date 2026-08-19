@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "logALP"
-version = "0.0.1"
+version = "0.1.0"
 description = "Magnetic-field morphology benchmarks for photon-ALP propagation"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -30,6 +30,10 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering :: Astronomy",
   "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+  "matplotlib>=3.7",
+  "numpy>=1.24",
 ]
 
 [project.urls]

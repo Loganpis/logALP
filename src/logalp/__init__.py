@@ -1,5 +1,16 @@
 """logALP: magnetic-field morphology benchmarks for photon-ALP propagation."""
 
-__version__ = "0.0.1"
+from logalp.analysis import ComparisonResult, compare
+from logalp.config import BenchmarkConfig
+from logalp.fields import FieldEnsemble, make_demo_fields
 
-__all__ = ["__version__"]
+__version__ = "0.1.0"
+
+__all__ = [
+    "BenchmarkConfig",
+    "ComparisonResult",
+    "FieldEnsemble",
+    "__version__",
+    "compare",
+    "make_demo_fields",
+]

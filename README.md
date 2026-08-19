@@ -5,9 +5,9 @@
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](pyproject.toml)
 [![Tests](https://img.shields.io/badge/tests-pytest-informational.svg)](tests/)
-[![Reproducibility](https://img.shields.io/badge/results-reproducible-success.svg)](reproduce.sh)
+[![Status](https://img.shields.io/badge/status-pre--alpha-orange.svg)](#current-implementation-status)
 
-> **Pre-alpha specification release:** the repository structure and installable package scaffold are available, but the scientific benchmark commands described below are planned rather than implemented. Numerical values and conventions labelled **manuscript check** must be verified against the final paper before the first scientific release.
+> **Pre-alpha release:** `logALP 0.1.0` includes a working synthetic-field comparison and plotting API for demonstration. Its propagation calculation is an explicitly labelled proxy. Validated perturbative Fourier and ALPro-style numerical backends are still planned, and numerical conventions labelled **manuscript check** must be verified before the first scientific release.
 
 ## Overview
 
@@ -28,6 +28,10 @@ x \equiv \frac{X}{\langle X\rangle}.
 
 The baseline is a morphology diagnostic, not an observational exclusion pipeline. Plasma-dependent phase evolution, instrumental response, source spectra, absorption, polarization averaging, and likelihood construction are optional extensions and must not be mixed into the acceptance tests for the controlled benchmark.
 
+## Current implementation status
+
+Version `0.1.0` implements the installable Python package, validated configuration object, reproducible matched synthetic fields, normalized demonstration comparison, summary statistics, four plotting methods, and an executed tutorial notebook. The physical perturbative solver, independent numerical solver, file adapters, CLI benchmark commands, and observational extensions described later in this document remain roadmap items.
+
 ## Repository goals
 
 - Reproduce the paper's controlled propagation experiment from a clean environment.
@@ -42,16 +46,16 @@ The baseline is a morphology diagnostic, not an observational exclusion pipeline
 
 The first public versions should be installed directly from GitHub. After a stable API is released on PyPI, `pip install logALP` can become the recommended route.
 
-### Install the latest tagged GitHub release
+### Install the current GitHub version
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate        # Windows PowerShell: .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install "logALP @ git+https://github.com/Loganpis/logALP.git@vX.Y.Z"
+python -m pip install "logALP @ git+https://github.com/Loganpis/logALP.git"
 ```
 
-Replace `vX.Y.Z` with a published release tag. Tagged releases are recommended for scientific work because the exact source can be cited and reproduced.
+Tagged releases will become the recommended installation route once the scientific API and conventions are frozen.
 
 ### Install a development checkout
 
@@ -75,75 +79,41 @@ This command should not be advertised as available until the distribution has ac
 
 ## Five-minute demonstration
 
-No IllustrisTNG files are required for the demo. The repository includes a small, synthetic, openly redistributable dataset containing two field ensembles on the baseline \(L=400\,\mathrm{kpc}\), \(N_z=200\) grid:
+No IllustrisTNG files are required. `make_demo_fields` generates two reproducible synthetic ensembles on the baseline \(L=400\,\mathrm{kpc}\), \(N_z=200\) grid:
 
-- a seeded non-Gaussian structured ensemble standing in for an MHD-like input; and
-- a GRF ensemble matched to its RMS strength and one-dimensional power spectrum.
+- a GRF-like ensemble with independent random Fourier phases; and
+- a phase-correlated ensemble with exactly matched paired Fourier amplitudes.
 
-The synthetic fixture demonstrates the workflow and software interface; it is not evidence for a physical property of IllustrisTNG clusters.
+The synthetic fields demonstrate the working API; they are not MHD simulations or evidence for a physical property of IllustrisTNG clusters.
 
-### Run the complete demo
+### Run the tutorial notebook
 
-```bash
-logalp demo --output demo-results
-```
-
-The command validates the inputs, performs perturbative propagation at 10, 25, 50, and 100 keV, verifies a subset with the numerical backend, normalizes \(X\) within each declared ensemble, compares both ensembles with the exponential null, and writes:
-
-```text
-demo-results/
-├── README.txt
-├── config.resolved.yaml
-├── environment.json
-├── inputs.manifest.json
-├── metrics.json
-├── tables/
-│   ├── solver_agreement.csv
-│   └── distribution_summary.csv
-└── figures/
-    ├── sightlines_and_spectra.pdf
-    ├── solver_parity.pdf
-    ├── normalized_distributions.pdf
-    └── tail_probabilities.pdf
-```
-
-Successful completion prints a compact summary such as:
-
-```text
-Input validation                 PASS
-GRF matching                     PASS
-Weak-mixing solver agreement     PASS
-Exponential-null diagnostics     RECORDED
-Results                          demo-results/
-```
-
-`RECORDED` is intentional: a statistical goodness-of-fit result is scientific output, not a software pass/fail condition.
+Open [`examples/logALP_demo.ipynb`](examples/logALP_demo.ipynb) and run it from top to bottom. It creates the fields internally and uses only public `logalp` functions for configuration, comparison, and plotting.
 
 ### Inspect the demo in Python
 
 ```python
-from logalp import BenchmarkConfig, compare, load_example
+import logalp
 
-fields = load_example("structured-vs-matched-grf")
-config = BenchmarkConfig.baseline()
-
-result = compare(
-    {
-        "structured": fields["structured"],
-        "matched_grf": fields["matched_grf"],
-    },
-    config=config,
-    solver="perturbative",
-    validate_with="numerical",
+config = logalp.BenchmarkConfig.baseline(
+    n_sightlines=600,
+    seed=240513,
 )
+fields = logalp.make_demo_fields(config)
+result = logalp.compare(fields, config)
 
-print(result.summary())
-result.save("demo-results-python")
+print(result.summary(tail_threshold=3.0))
+result.plot_sightlines()
+result.plot_power_spectra()
+result.plot_distributions()
+result.plot_tail_probabilities(threshold=3.0)
 ```
 
-The example API is part of the design specification and will be finalized during implementation. The eventual quick start must be executed in continuous integration so that every published command is known to work.
+These functions are implemented and covered by the package test suite. The proxy they currently call is educational and will be replaced or supplemented by validated scientific backends without changing the basic user workflow.
 
-## Using your own magnetic-field sightlines
+## Planned: using your own magnetic-field sightlines
+
+> The commands in this section specify the intended post-demo interface; they are not implemented in `0.1.0`.
 
 Users normally provide one-dimensional field ensembles extracted from their MHD, GRF, cell-based, analytic, or other magnetic-field models. Raw three-dimensional simulation volumes are not required by the core package.
 

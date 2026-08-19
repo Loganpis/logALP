@@ -1,4 +1,4 @@
-"""Command-line entry point for the logALP pre-alpha scaffold."""
+"""Command-line entry point for logALP."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ def build_parser() -> argparse.ArgumentParser:
         prog="logalp",
         description=(
             "logALP magnetic-field morphology benchmarks "
-            "(pre-alpha specification release)"
+            "(pre-alpha demonstration release)"
         ),
     )
     parser.add_argument(
