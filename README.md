@@ -52,10 +52,12 @@ The first public versions should be installed directly from GitHub. After a stab
 python -m venv .venv
 source .venv/bin/activate        # Windows PowerShell: .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install "logALP @ git+https://github.com/Loganpis/logALP.git"
+python -m pip install --upgrade "logALP @ git+https://github.com/Loganpis/logALP.git"
 ```
 
 Tagged releases will become the recommended installation route once the scientific API and conventions are frozen.
+
+If a running notebook previously imported `logALP 0.0.1`, upgrade the package and restart the kernel before using the `0.1.0` API. The tutorial notebook checks this automatically.
 
 ### Install a development checkout
 
