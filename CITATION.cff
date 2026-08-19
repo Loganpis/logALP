@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use logALP, please cite the archived software release and companion paper."
+title: "logALP: Magnetic-field morphology benchmarks for photon-ALP propagation"
+type: software
+authors:
+  - name: Loganpis
+repository-code: "https://github.com/Loganpis/logALP"
+url: "https://github.com/Loganpis/logALP"
+version: 0.0.1
+date-released: 2026-08-19
+license: BSD-3-Clause
